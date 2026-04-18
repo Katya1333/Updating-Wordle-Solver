@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wordle Solver!</title>
+    <style>
+        body{
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+        p{
+            font-size: 25px;
+        }
+        .but{
+            color: white;
+            background-color: black;
+        }
+        #Cgre{
+            color: green;
+        }
+        #Cye{
+            color: gold;
+        }
+        #Cgra{
+            color: gray;
+        }
+        .wordle{
+            font-size: 80px;
+            font-weight: bolder;
+            color: gray;
+        }
+        .error{
+            color: red;
+        }
+        button{
+            font-size: 25px;
+            color: white;
+            background-color: black;
+        }
+        #half1{
+            float: left;
+            width: 50%;
+        }
+        .pastGuesses{
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            font-size: 80px;
+            font-weight: bolder;
+            color: gray;
+        }
+        #half2{
+            float: left;
+            width: 50%;
+            height: 24.5em;
+            background-color: lightgrey;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wordle Solver!</h1>
+    <p>
+        <b>Directions:</b> Use this tool to help you solve Wordle! First, start by typing the first five 
+        letter word you entered in Wordle (your first guess). Only type lowercase letters. If you 
+        misspelled the word, press the <span class="but">Clear</span> button. Next, click letters to 
+        change their colors (in the order: <span id="Cgre">green</span>, <span id="Cye">yellow</span>, 
+        <span id="Cgra">gray</span>). Make sure your word and colors match on Wordle, then press 
+        <span class="but">Enter</span>. A list of possible valid choice words will show up in the 
+        right-hand column. Use one of these choices for your next guess on Wordle!
+    </p>
+    <div id="half1">
+        <div class="wordle">
+            <span class="letter one" onclick="colorChanger(this)">_</span>
+            <span class="letter two" onclick="colorChanger(this)">_</span>
+            <span class="letter three" onclick="colorChanger(this)">_</span>
+            <span class="letter four" onclick="colorChanger(this)">_</span>
+            <span class="letter five" onclick="colorChanger(this)">_</span>
+        </div>
+        <p class="error"></p>
+        <button class="clear">Clear</button>
+        <button class="enter" onclick="generateList()">Enter</button>
+        <h2>Past Guesses:</h2>
+        <ul class="pastGuesses"></ul>
+    </div>
+    <div id="half2">
+        <h2>Possible Valid Words:</h2>
+        <ul class="wordList"></ul>
+    </div>
+    <script>
+        count=0;
+        ALPHABET="abcdefghijklmnopqrstuvwxyz";
+        numClicks=1;
+        genListCount = 0;
+
+        gray = "";
+        green = "";
+        yellow = "";
+
+        window.addEventListener("keydown", async (ev) => {
+            if(ALPHABET.includes(ev.key)){
+                count++;
+                if(count==1){
+                    document.querySelector('.one').innerHTML = (ev.key).charAt(0).toUpperCase();
+                }
+                if(count==2){
+                    document.querySelector('.two').innerHTML = (ev.key).charAt(0).toUpperCase();
+                }
+                if(count==3){
+                    document.querySelector('.three').innerHTML = (ev.key).charAt(0).toUpperCase();
+                }
+                if(count==4){
+                    document.querySelector('.four').innerHTML = (ev.key).charAt(0).toUpperCase();
+                }
+                if(count==5){
+                    document.querySelector('.five').innerHTML = (ev.key).charAt(0).toUpperCase();
+                }
+            }
+            else{
+                document.querySelector('.error').innerHTML = "You didn't type a proper character. Lowercase letters only!";
+            }
+        })
+
+        document.querySelector(".clear").addEventListener("click", clear);
+        function clear(){
+            document.querySelector('.one').innerHTML = "_";
+            document.querySelector('.two').innerHTML = "_";
+            document.querySelector('.three').innerHTML = "_";
+            document.querySelector('.four').innerHTML = "_";
+            document.querySelector('.five').innerHTML = "_";
+            document.querySelector('.error').innerHTML = "";
+            count=0;
+            let letters = document.querySelectorAll('.letter');
+            //console.log(letters);
+            letters.forEach(letter => { letter.style.color = "gray"; });
+        }
+        function colorChanger(letter){
+            //console.log("pressed");
+            if(numClicks%2==0){
+			    letter.style.color = "gold";
+            }
+            else if(numClicks%3==0){
+                letter.style.color = "gray";
+            }
+            else{
+                letter.style.color = "green";
+            }
+            numClicks++;
+            if(numClicks>3){
+                numClicks=1;
+            }
+        }
+
+        async function generateList(){
+            genListCount++;
+            let letters = document.querySelectorAll('.letter');
+            let grayStr = "";
+            let greenStr = "";
+            let yellowStr = "";
+
+            document.querySelector(".wordList").innerHTML = "";
+            pastWord = document.querySelector('.one').textContent + document.querySelector('.two').textContent + document.querySelector('.three').textContent + document.querySelector('.four').textContent + document.querySelector('.five').textContent +"";
+            let ul_pg = document.querySelector('.pastGuesses')
+            let li_ = document.createElement("li");
+            li_.classList.add("pgLi"+genListCount);
+            ul_pg.appendChild(li_);
+            changeLetterColor(genListCount, pastWord, 0, document.querySelector('.one').style.color);
+            changeLetterColor(genListCount, pastWord, 1, document.querySelector('.two').style.color);
+            changeLetterColor(genListCount, pastWord, 2, document.querySelector('.three').style.color);
+            changeLetterColor(genListCount, pastWord, 3, document.querySelector('.four').style.color);
+            changeLetterColor(genListCount, pastWord, 4, document.querySelector('.five').style.color);
+
+            for(let i=0; i<letters.length; i++){
+                let ch = letters[i].textContent;
+                let color = window.getComputedStyle(letters[i]).color + "";
+                //console.log(color); //green: rgb(0, 128, 0), yellow: rgb(255, 215, 0), gray: rgb(128, 128, 128)
+                if(ch=="_"){
+                    document.querySelector('.error').innerHTML = "The word must be 5 letters.";
+                }
+                else{
+                    if(color=="rgb(0, 128, 0)"){
+                        greenStr += ch.toLowerCase();
+                        yellowStr += ".";
+                    }
+                    else if(color=="rgb(255, 215, 0)"){
+                        greenStr += ".";
+                        yellowStr += ch.toLowerCase();
+                    }
+                    else{
+                        greenStr += ".";
+                        yellowStr += ".";
+                        grayStr += ch.toLowerCase();
+                    }
+                }
+            }
+
+            //gray = gray + grayStr; //update gray
+
+            if(green==""){ //update green
+                green = greenStr;
+            }
+            else{
+                for(let c=0; c<5; c++){
+                    if(greenStr.charAt(c)!="."){
+                        green = green.substring(0, c) + greenStr.charAt(c) + green.substring(c + 1);
+                    }
+                }
+            }
+
+            for(let j=0; j<5; j++){ //update yellow
+                d = j%5;
+                /*if(yellow.charAt(d)!="." && green.includes(yellow.charAt(d))){
+                    yellow = yellow.substring(0, d) + "." + yellow.substring(d + 1);
+                }
+                if(yellow.charAt(d)!=yellowStr.charAt(d) && yellow.charAt(d)=="."){
+                    yellow = yellow.substring(0, d) + yellowStr.charAt(d) + yellow.substring(d + 1);
+                }*/
+                if(yellow.charAt(d)==green.charAt(d) && yellow.charAt(d)!="."){
+                    yellow = yellow.substring(0, d) + "." + yellow.substring(d + 1);
+                }
+                if(yellowStr.charAt(d)==green.charAt(d) && yellowStr.charAt(d)!="."){
+                    yellowStr = yellowStr.substring(0, d) + "." + yellowStr.substring(d + 1);
+                }
+            }
+            yellow = yellow+yellowStr;
+
+            for(let b=0; b<5; b++){ //update gray
+                if(grayStr.includes(green.charAt(b))){
+                    grayStr = grayStr.replace(new RegExp(green.charAt(b), 'g'), '');
+                }
+                if(grayStr.includes(yellow.charAt(b))){
+                    grayStr = grayStr.replace(new RegExp(yellow.charAt(b), 'g'), '');
+                }
+            }
+            gray = gray + grayStr;
+
+            console.log(gray);
+            console.log(green);
+            console.log(yellow);
+            let url = `http://127.0.0.1:5000/${gray}/${green}/${yellow}`;
+            console.log(url);
+            const response = await fetch(url);
+            const myData = await response.json();
+            myData.forEach((word, index) => {
+                let ul_teams = document.querySelector('.wordList')
+                let li_node = document.createElement("li");
+                li_node.innerHTML = word;
+                ul_teams.appendChild(li_node)
+            });
+            document.querySelector('#half2').style.height = 'auto';
+        }
+
+        function changeLetterColor(count, text, letterIndex, color){
+            let front = "";
+            if (letterIndex !== 0){
+                front = text.substring(0, letterIndex);
+            }
+            let end = "";
+            if (letterIndex !== text.length - 1){
+                end = text.substring(letterIndex + 1);
+            }
+
+            //console.log(front+end);
+            document.querySelector(".pgLi"+count).insertAdjacentHTML('beforeend', `<span style="color: ${color};">${text.substring(letterIndex,letterIndex+1)}</span>`);
+        }
+    </script>
+</body>
+</html>
