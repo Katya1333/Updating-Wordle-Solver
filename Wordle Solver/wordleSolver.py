@@ -4,7 +4,7 @@ from flask import Flask, jsonify, render_template, request
 app = Flask(__name__)
 
 # This creates all 243 possible feedback patterns:
-# Note: B  represents gray and G represents green
+# Note: B represents gray and G represents green
 feedback_patterns_list = [
     a + b + c + d + e
     for a in "GYB"
