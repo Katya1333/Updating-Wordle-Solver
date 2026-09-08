@@ -21,9 +21,13 @@ word_list.append('inbox')
 # real word:
 def pattern_counts(guess, survivors):
     feedback_patterns_counts = {patternn: 0 for patternn in feedback_patterns_list}
+    print("guess:"+guess)
+    print("survivors:")
     for w in survivors:
         pattern = get_feedback(guess, w)
+        print("["+w+","+pattern+"] ", end="")
         feedback_patterns_counts[pattern] += 1
+    print()
     return feedback_patterns_counts
 
 # This gives the pattern of GYB for a given word and guess:
@@ -42,7 +46,7 @@ def get_feedback(guess, answer):
         if guess[i] in answer_list:
             pattern[i] = "Y"
             answer_list[answer_list.index(guess[i])] = None
-
+    
     return "".join(pattern)
 
 # This will be used to turn the pattern_counts returned dictionary to a pattern probability 
