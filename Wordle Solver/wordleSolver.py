@@ -16,6 +16,7 @@ feedback_patterns_list = [
 
 word_list = open("enable1.txt","r").read().splitlines()
 word_list.append('inbox')
+word_list.append('stent') # added 11/21/2026; discovered missing through Wordle
 
 # This returns a dictionary (len 243) that has a count for each pattern given that 'guess' is the
 # real word:
@@ -25,9 +26,11 @@ def pattern_counts(guess, survivors):
     print("survivors:")
     for w in survivors:
         pattern = get_feedback(guess, w)
-        print("["+w+","+pattern+"] ", end="")
+        #print("["+w+","+pattern+"] ", end="")
         feedback_patterns_counts[pattern] += 1
-    print()
+    #print(len(survivors))
+    if guess == "roles":
+        print("guess: "+guess+"\nsurvivors: "+str(len(survivors))+"\nfeedback_patterns_counts: "+str(feedback_patterns_counts))
     return feedback_patterns_counts
 
 # This gives the pattern of GYB for a given word and guess:
